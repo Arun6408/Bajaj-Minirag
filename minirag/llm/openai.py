@@ -79,6 +79,10 @@ from pydantic import BaseModel
 from typing import List
 import numpy as np
 from typing import Union
+import time
+import re
+from openai import RateLimitError
+import asyncio
 
 
 @retry(
@@ -102,13 +106,6 @@ async def openai_complete_if_cache(
     api_key=None,
     **kwargs,
 ) -> str:
-    # if api_key:
-    #     os.environ["OPENAI_API_KEY"] = api_key
-    # if base_url==None:
-    #     base_url = os.environ["OPENAI_API_BASE"]
-    # openai_async_client = (
-    #     AsyncOpenAI() if base_url is None else AsyncOpenAI(base_url=base_url)
-    # )
     api_key = os.getenv("OPENAI_API_KEY")
     base_url = os.getenv("OPENAI_API_BASE")
     openai_async_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
@@ -190,21 +187,28 @@ async def gpt_4o_complete(
         **kwargs,
     )
 
-
 async def gpt_4o_mini_complete(
     prompt, system_prompt=None, history_messages=[], keyword_extraction=False, **kwargs
 ) -> str:
     keyword_extraction = kwargs.pop("keyword_extraction", None)
     if keyword_extraction:
         kwargs["response_format"] = GPTKeywordExtractionFormat
-    return await openai_complete_if_cache(
-        # "gpt-4o-mini",
-        "gpt-4.1-nano-2025-04-14",
-        prompt,
-        system_prompt=system_prompt,
-        history_messages=history_messages,
-        **kwargs,
-    )
+
+    while True:
+        try:
+            return await openai_complete_if_cache(
+                "gpt-4.1-nano-2025-04-14",
+                prompt,
+                system_prompt=system_prompt,
+                history_messages=history_messages,
+                **kwargs,
+            )
+        except RateLimitError as e:
+            msg = str(e)
+            wait_match = re.search(r'try again in (\d+)s', msg)
+            wait_time = int(wait_match.group(1)) if wait_match else 60
+            await asyncio.sleep(wait_time)
+
 
 
 async def nvidia_openai_complete(

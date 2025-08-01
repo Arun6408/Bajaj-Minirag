@@ -25,10 +25,7 @@ def hackrx_run():
     if not documents or not questions:
         return jsonify({"error": "Missing documents or questions"}), 400
     doc_text = get_ocr_response(documents)
-
-    # Example processing (replace with real logic)
     answers = rag_v1(doc_text,questions)
-
     return jsonify({
         "answers": answers
     }), 200
