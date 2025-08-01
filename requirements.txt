@@ -1,0 +1,54 @@
+# Core dependencies from minirag/api/requirements.txt
+ascii_colors
+fastapi
+nest_asyncio
+numpy
+pipmaster
+python-dotenv
+python-multipart
+tenacity
+tiktoken
+torch
+tqdm
+uvicorn
+json_repair
+
+# Flask for the main app
+flask
+
+# Hugging Face dependencies
+huggingface_hub
+transformers
+sentence-transformers
+
+# Mistral AI for OCR
+mistralai
+
+# Database and storage dependencies
+weaviate
+redis
+asyncpg
+psycopg
+psycopg-pool
+oracledb
+neo4j
+pymongo
+motor
+nano-vectordb
+
+# Machine learning and NLP
+scikit-learn
+nltk
+rouge
+
+# Network and graph processing
+networkx
+
+# Additional utilities
+aiohttp
+pydantic
+
+# Optional: For development and testing
+pytest
+pytest-asyncio 
+gunicorn
